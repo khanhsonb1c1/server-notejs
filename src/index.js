@@ -25,7 +25,7 @@ mongoose.connect(
   }
 );
 
-app.use("/api/blog", blogRoute);
+app.use("/api/blogs", blogRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

@@ -8,8 +8,6 @@ const blogController = {
         content: req.body.content,
         description: req.body.description,
         title: req.body.title,
-        // countComments: req.body.countComments,
-        // countLikes: req.body.countLikes,
       });
       const saveBlog = await newBlog.save();
 
@@ -24,8 +22,28 @@ const blogController = {
 
   fetch: async (req, res) => {
     try {
-      const blogs = await Blog.find();
-      res.status(200).json(blogs);
+      const PAGE_SIZE = 12;
+
+      const page = parseInt(req.query.page) || 1;
+
+      const skip = (page - 1) * PAGE_SIZE;
+
+      const blogs = await Blog.find().skip(skip).limit(PAGE_SIZE);
+
+      const total = Math.ceil(blogs.length / PAGE_SIZE);
+
+      res
+        .status(200)
+        .json({ data: blogs, current_page: page, last_page: total });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+
+  detail: async (req, res) => {
+    try {
+      const blog = await Blog.findOne({ id: req.params.id });
+      res.status(200).json(blog);
     } catch (error) {
       res.status(500).json(error);
     }
