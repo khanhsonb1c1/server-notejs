@@ -9,62 +9,62 @@ const blogSchema = new mongoose.Schema({
 
   title: {
     type: String,
-    requied: true,
+    required: true,
   },
 
   description: {
     type: String,
-    requied: true,
+    required: true,
   },
 
   content: {
     type: String,
-    requied: true,
+    required: true,
   },
 
   created_at: {
     type: Number,
     default: Math.round(+new Date() / 1000),
-    requied: true,
+    required: true,
   },
 
   updated_at: {
     type: Number,
     default: Math.round(+new Date() / 1000),
-    requied: true,
+    required: true,
   },
 
   countComments: {
     type: Number,
-    requied: true,
+    required: true,
     default: 0,
   },
 
   countLikes: {
     type: Number,
-    requied: true,
+    required: true,
     default: 0,
   },
 
-  //   categories: [
-  //     {
-  //       type: mongoose.Schema.Types.ObjectId,
-  //       ref: "Category",
-  //     },
-  //   ],
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
 
-  //   author: {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "User",
-  //     default: false,
-  //   },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: false,
+    },
 
-  //   comment: [
-  //     {
-  //       type: mongoose.Schema.Types.ObjectId,
-  //       ref: "Comment",
-  //     },
-  //   ],
+    comment: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
 });
 
 const Blog = mongoose.model("Blog", blogSchema);

@@ -9,15 +9,20 @@ const musicSchema = new mongoose.Schema({
 
   name: {
     type: String,
-    requied: true,
+    required: true,
   },
 
-  tags: [
+  tags: [ 
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tag",
     },
   ],
+
+  album: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Album",
+  },
 
   singers: [
     {
@@ -28,19 +33,20 @@ const musicSchema = new mongoose.Schema({
 
   ranker: {
     type: Number || null,
-    requied: false,
+    required: false,
     default: null,
   },
 
-  music_url: {
+  image_url: {
     type: String,
-    requied: true,
+    required: true,
   },
+
 
   updated_at: {
     type: Number,
     default: Math.round(+new Date() / 1000),
-    requied: true,
+    required: true,
   },
 });
 

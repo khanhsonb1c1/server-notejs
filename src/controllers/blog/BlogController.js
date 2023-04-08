@@ -1,4 +1,5 @@
 const { Blog } = require("../../models/blog/BlogModel");
+const { Category } = require("../../models/blog/CategoryModel");
 
 const blogController = {
   create: async (req, res) => {
@@ -8,11 +9,24 @@ const blogController = {
         content: req.body.content,
         description: req.body.description,
         title: req.body.title,
+        categories: req.body.categories,
       });
+
       const saveBlog = await newBlog.save();
 
+      // add
+      if (req.body.categories) {
+        const category = Category.findById(req.body.categories);
+
+        await category.updateOne({
+          $push: {
+            blogs: saveBlog._id,
+          },
+        });
+      }
+
       res.status(200).json({
-        message: "add new cart successfully.",
+        message: "add new blog successfully.",
         blog: saveBlog,
       });
     } catch (error) {
@@ -44,6 +58,32 @@ const blogController = {
     try {
       const blog = await Blog.findOne({ id: req.params.id });
       res.status(200).json(blog);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+
+  update: async (req, res) => {
+    try {
+      const blog = await Blog.findById(req.params.id);
+      await blog.updateOne({ $set: req.body });
+      res.status(200).json("Updated successfully !");
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      //delete blog in category
+      await Category.updateMany(
+        { blogs: req.params.id },
+        { $pull: { blogs: req.params.id } } // móc mấy cái blog có id = param id ( xóa đi)
+      );
+
+      await Blog.findByIdAndDelete(req.params.id);
+
+      res.status(200).json("Deleted successfully !");
     } catch (error) {
       res.status(500).json(error);
     }

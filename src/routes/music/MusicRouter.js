@@ -6,4 +6,6 @@ router.post("/", musicController.create);
 
 router.get("/", musicController.fetch);
 
+router.get("/:id", musicController.detail);
+
 module.exports = router;
