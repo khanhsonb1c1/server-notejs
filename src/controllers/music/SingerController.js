@@ -1,14 +1,30 @@
 const { Singer } = require("../../models/music/SingerModel");
+const cloudinary = require("cloudinary").v2;
+const fs = require('fs-extra');
+
+cloudinary.config({
+  cloud_name: "dionk3ia2",
+  api_key: "644653757634464",
+  api_secret: "9a6REbcMkfxUYpEp5Gv1BO_KURM",
+});
 
 const singerController = {
   create: async (req, res) => {
     try {
+      const singer_save = await cloudinary.uploader.upload(req.file.path, {
+        folder: process.env.CLOUDINARY_FOLDER_SINGER,
+      });
+
       const newSinger = new Singer({
         id: req.body.id,
         name: req.body.name,
-        image_url: req.body.image_url,
+        image_url: singer_save.url,
       });
+
+      // console.log(req.file)
       const saveSinger = await newSinger.save();
+
+      await fs.remove(req.file.path);
 
       res.status(200).json({
         message: "add new singer successfully.",

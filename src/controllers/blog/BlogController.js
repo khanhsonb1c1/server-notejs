@@ -10,6 +10,8 @@ const blogController = {
         description: req.body.description,
         title: req.body.title,
         categories: req.body.categories,
+        author: req.body.author,
+        image_url: req.body.image_url,
       });
 
       const saveBlog = await newBlog.save();

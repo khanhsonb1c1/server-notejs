@@ -1,43 +1,74 @@
 const { Music } = require("../../models/music/MusicModel");
-const { Album} = require("../../models/music/AlbumModel");
+const { Album } = require("../../models/music/AlbumModel");
 const { Singer } = require("../../models/music/SingerModel");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs-extra");
+
+//! SETUP UPLOAD FILE
+
+cloudinary.config({
+  cloud_name: "dionk3ia2",
+  api_key: "644653757634464",
+  api_secret: "9a6REbcMkfxUYpEp5Gv1BO_KURM",
+});
 
 const musicController = {
   create: async (req, res) => {
     try {
+      const song_save = await cloudinary.uploader.upload(
+        req.files.image_url[0].path,
+        {
+          folder: process.env.CLOUDINARY_FOLDER_SONG,
+        }
+      );
+      const music_save = await cloudinary.uploader.upload(
+        req.files.play_url[0].path,
+        {
+          folder: process.env.CLOUDINARY_FOLDER_MUSIC,
+          resource_type: "video",
+          format: "mp3",
+        }
+      );
+
       const newMusic = new Music({
         id: req.body.id,
         name: req.body.name,
         tag: req.body.tag,
         album: req.body.album,
-        image_url: req.body.image_url,
-        singers: req.body.singers
-        
+        image_url: song_save.url,
+        singers: req.body.singers,
+        play_url: music_save.url,
       });
+
       const saveMusic = await newMusic.save();
 
+      // remove file saved in public/data
+      await fs.remove(req.files.play_url[0].path);
+
+      await fs.remove(req.files.image_url[0].path);
+
       // add music to album
-      if(req.body.album){
+      if (req.body.album) {
         const album = Album.findById(req.body.album);
         await album.updateOne({
           // $push: thêm truong _id  vào array Album, push chỉ dùng cho array
           $push: {
-            musics: saveMusic._id
-          }
-        })
+            musics: saveMusic._id,
+          },
+        });
       }
       // add music to singer
-      if(req.body.singers){
+      if (req.body.singers) {
         const singer = Singer.findById(req.body.singers);
         await singer.updateOne({
           // $push: thêm trường _id vào array Singer
           $push: {
-            musics: saveMusic._id
-          }
-        })
+            musics: saveMusic._id,
+          },
+        });
       }
 
-      res.status(200).json({
+      res.json({
         message: "add new music successfully.",
         music: saveMusic,
       });
@@ -48,22 +79,22 @@ const musicController = {
 
   fetch: async (req, res) => {
     try {
-        const PAGE_SIZE = 12;
-  
-        const page = parseInt(req.query.page) || 1;
-  
-        const skip = (page - 1) * PAGE_SIZE;
-  
-        const musics = await Music.find().skip(skip).limit(PAGE_SIZE);
-  
-        const total = Math.ceil(musics.length / PAGE_SIZE);
-  
-        res
-          .status(200)
-          .json({ data: musics, current_page: page, last_page: total });
-      } catch (error) {
-        res.status(500).json(error);
-      }
+      const PAGE_SIZE = 12;
+
+      const page = parseInt(req.query.page) || 1;
+
+      const skip = (page - 1) * PAGE_SIZE;
+
+      const musics = await Music.find().skip(skip).limit(PAGE_SIZE);
+
+      const total = Math.ceil(musics.length / PAGE_SIZE);
+
+      res
+        .status(200)
+        .json({ data: musics, current_page: page, last_page: total });
+    } catch (error) {
+      res.status(500).json(error);
+    }
   },
 
   detail: async (req, res) => {

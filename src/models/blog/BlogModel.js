@@ -12,6 +12,11 @@ const blogSchema = new mongoose.Schema({
     required: true,
   },
 
+  image_url:{
+    type: String,
+    required: true,
+  },
+
   description: {
     type: String,
     required: true,
@@ -56,7 +61,7 @@ const blogSchema = new mongoose.Schema({
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      default: false,
+      required: false,
     },
 
     comment: [
