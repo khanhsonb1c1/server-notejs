@@ -19,6 +19,6 @@ const TagSchema = new mongoose.Schema({
   },
 });
 
-const Singer = mongoose.model("Singer", TagSchema);
+const Tag = mongoose.model("Tag", TagSchema);
 
-module.exports = { Singer };
+module.exports = { Tag };

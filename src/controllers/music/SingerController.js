@@ -1,12 +1,6 @@
 const { Singer } = require("../../models/music/SingerModel");
-const cloudinary = require("cloudinary").v2;
-const fs = require('fs-extra');
-
-cloudinary.config({
-  cloud_name: "dionk3ia2",
-  api_key: "644653757634464",
-  api_secret: "9a6REbcMkfxUYpEp5Gv1BO_KURM",
-});
+const cloudinary = require("../../services/cloudinary");
+const fs = require("fs-extra");
 
 const singerController = {
   create: async (req, res) => {

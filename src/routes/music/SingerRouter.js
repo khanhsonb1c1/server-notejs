@@ -1,11 +1,9 @@
 const singerController = require("../../controllers/music/SingerController");
-
 const upload = require("../../middlewares/upload");
-
 
 const router = require("express").Router();
 
-router.post("/",upload.single("image_url"), singerController.create);
+router.post("/", upload.single("image_url"), singerController.create);
 
 router.get("/", singerController.fetch);
 

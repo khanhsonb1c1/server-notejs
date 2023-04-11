@@ -1,26 +1,22 @@
 const { Music } = require("../../models/music/MusicModel");
 const { Album } = require("../../models/music/AlbumModel");
 const { Singer } = require("../../models/music/SingerModel");
-const cloudinary = require("cloudinary").v2;
+const cloudinary = require("../../services/cloudinary");
 const fs = require("fs-extra");
-
-//! SETUP UPLOAD FILE
-
-cloudinary.config({
-  cloud_name: "dionk3ia2",
-  api_key: "644653757634464",
-  api_secret: "9a6REbcMkfxUYpEp5Gv1BO_KURM",
-});
 
 const musicController = {
   create: async (req, res) => {
     try {
-      const song_save = await cloudinary.uploader.upload(
-        req.files.image_url[0].path,
-        {
-          folder: process.env.CLOUDINARY_FOLDER_SONG,
-        }
-      );
+      let song_save = { url: "" };
+      if (req.body.image_url) {
+        song_save = await cloudinary.uploader.upload(
+          req.files.image_url[0].path,
+          {
+            folder: process.env.CLOUDINARY_FOLDER_SONG,
+          }
+        );
+      }
+
       const music_save = await cloudinary.uploader.upload(
         req.files.play_url[0].path,
         {
@@ -29,6 +25,12 @@ const musicController = {
           format: "mp3",
         }
       );
+
+      // remove file saved in public/data
+      if (req.body.image_url) {
+        await fs.remove(req.files.image_url[0].path);
+      }
+      await fs.remove(req.files.play_url[0].path);
 
       const newMusic = new Music({
         id: req.body.id,
@@ -42,12 +44,7 @@ const musicController = {
 
       const saveMusic = await newMusic.save();
 
-      // remove file saved in public/data
-      await fs.remove(req.files.play_url[0].path);
-
-      await fs.remove(req.files.image_url[0].path);
-
-      // add music to album
+      // // add music to album
       if (req.body.album) {
         const album = Album.findById(req.body.album);
         await album.updateOne({
@@ -57,7 +54,7 @@ const musicController = {
           },
         });
       }
-      // add music to singer
+      // // add music to singer
       if (req.body.singers) {
         const singer = Singer.findById(req.body.singers);
         await singer.updateOne({
@@ -67,6 +64,9 @@ const musicController = {
           },
         });
       }
+
+      // if (req.body.tag) {
+      // }
 
       res.json({
         message: "add new music successfully.",

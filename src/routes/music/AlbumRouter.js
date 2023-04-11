@@ -1,8 +1,9 @@
 const albumController = require("../../controllers/music/AlbumController");
+const upload = require("../../middlewares/upload");
 
 const router = require("express").Router();
 
-router.post("/", albumController.create);
+router.post("/", upload.single("image_url"), albumController.create);
 
 router.get("/", albumController.fetch);
 

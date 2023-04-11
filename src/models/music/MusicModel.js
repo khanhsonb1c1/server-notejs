@@ -44,7 +44,7 @@ const musicSchema = new mongoose.Schema({
 
   play_url: {
     type: String,
-    required: false,
+    required: true,
   },
 
 

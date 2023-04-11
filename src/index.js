@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 
-//* decrare blog route 
+//* decrare blog route
 const blogRoute = require("./routes/blog/BlogRouter");
 const categoryRoute = require("./routes/blog/CategoryRouter");
 
@@ -15,6 +15,7 @@ const categoryRoute = require("./routes/blog/CategoryRouter");
 const musicRoute = require("./routes/music/MusicRouter");
 const albumRoute = require("./routes/music/AlbumRouter");
 const singerRoute = require("./routes/music/SingerRouter");
+const tagRoute = require("./routes/music/TagRouter");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
@@ -30,7 +31,6 @@ mongoose.connect(process.env.MONGOOSE_URL, () => {
   console.log("success: ", process.env.MONGOOSE_URL);
 });
 
-
 //! this is decrare path api
 
 //* BLOG
@@ -41,11 +41,11 @@ app.use("/api/categories", categoryRoute);
 app.use("/api/musics", musicRoute);
 app.use("/api/albums", albumRoute);
 app.use("/api/singers", singerRoute);
+app.use("/api/tags", tagRoute);
 
 app.get("/", (req, res) => {
   res.send("Wellcome to server of Khanh Son !");
 });
-
 
 let PORT = process.env.PORT || 5005;
 app.listen(PORT, () => console.log(`App running on port: ${PORT}`));

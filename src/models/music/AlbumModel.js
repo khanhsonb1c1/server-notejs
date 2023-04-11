@@ -12,6 +12,11 @@ const albumSchema = new mongoose.Schema({
     required: true,
   },
 
+  image_url:{
+    type: String,
+    required: true,
+  },
+
   singers: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +34,7 @@ const albumSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Music",
+      required: false,
     },
   ],
 

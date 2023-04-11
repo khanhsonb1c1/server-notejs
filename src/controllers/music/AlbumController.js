@@ -1,17 +1,37 @@
 const { Album } = require("../../models/music/AlbumModel");
+const fs = require("fs-extra");
+const { Singer } = require("../../models/music/SingerModel");
+
+const cloudinary = require("../../services/cloudinary")
 
 const albumController = {
   create: async (req, res) => {
     try {
+      const image_save = await cloudinary.uploader.upload(req.file.path, {
+        folder: process.env.CLOUDINARY_FOLDER_ALBUM,
+      });
+
       const newAlbum = new Album({
         id: req.body.id,
         name: req.body.name,
-        singers: req.body.singer,
-        musics: req.body.musics,  
-        musics: req.body.musics,      
+        singer: req.body.singer,
+        image_url: image_save.url,
+        // musics: req.body.musics,
       });
-      
+
       const saveAlbum = await newAlbum.save();
+
+      await fs.remove(req.file.path);
+
+      // add album to singer
+      if (req.body.singer) {
+        const singer = await Singer.findById(req.body.singer);
+        await singer.updateOne({
+          $push: {
+            albums: saveAlbum._id,
+          },
+        });
+      }
 
       res.status(200).json({
         message: "add new album successfully.",
@@ -24,22 +44,22 @@ const albumController = {
 
   fetch: async (req, res) => {
     try {
-        const PAGE_SIZE = 12;
-  
-        const page = parseInt(req.query.page) || 1;
-  
-        const skip = (page - 1) * PAGE_SIZE;
-  
-        const albums = await Album.find().skip(skip).limit(PAGE_SIZE);
-  
-        const total = Math.ceil(albums.length / PAGE_SIZE);
-  
-        res
-          .status(200)
-          .json({ data: albums, current_page: page, last_page: total });
-      } catch (error) {
-        res.status(500).json(error);
-      }
+      const PAGE_SIZE = 12;
+
+      const page = parseInt(req.query.page) || 1;
+
+      const skip = (page - 1) * PAGE_SIZE;
+
+      const albums = await Album.find().skip(skip).limit(PAGE_SIZE);
+
+      const total = Math.ceil(albums.length / PAGE_SIZE);
+
+      res
+        .status(200)
+        .json({ data: albums, current_page: page, last_page: total });
+    } catch (error) {
+      res.status(500).json(error);
+    }
   },
 
   detail: async (req, res) => {

@@ -24,7 +24,7 @@ const singerSchema = new mongoose.Schema({
     },
   ],
   
-  album: [
+  albums: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Album",
