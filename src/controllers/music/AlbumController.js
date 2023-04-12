@@ -85,16 +85,24 @@ const albumController = {
 
   delete: async (req, res) => {
     try {
-      const music = Music.find({
-        album: req.params.id,
-      });
-      await music[0].updateOne({
-        $push: { album: "" },
-      });
+      await Music.updateMany(
+        {
+          album: req.params.id,
+        },
+        {
+          album: null,
+        }
+      );
 
       await Singer.updateMany(
-        { albums: req.params.id },
-        { $pull: { albums: req.params.id } }
+        {
+          albums: req.params.id,
+        },
+        {
+          $pull: {
+            albums: req.params.id,
+          },
+        }
       );
 
       await Album.findByIdAndDelete(req.params.id);
