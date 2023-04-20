@@ -7,15 +7,12 @@ const fs = require("fs-extra");
 const musicController = {
   create: async (req, res) => {
     try {
-      let song_save = { url: "" };
-      if (req.body.image_url) {
-        song_save = await cloudinary.uploader.upload(
-          req.files.image_url[0].path,
-          {
-            folder: process.env.CLOUDINARY_FOLDER_SONG,
-          }
-        );
-      }
+      const song_save = await cloudinary.uploader.upload(
+        req.files.image_url[0].path,
+        {
+          folder: process.env.CLOUDINARY_FOLDER_SONG,
+        }
+      );
 
       const music_save = await cloudinary.uploader.upload(
         req.files.play_url[0].path,
@@ -46,6 +43,7 @@ const musicController = {
 
       // // add music to album
       if (req.body.album) {
+        // add music vao album
         const album = Album.findById(req.body.album);
         await album.updateOne({
           // $push: thêm truong _id  vào array Album, push chỉ dùng cho array
@@ -56,6 +54,7 @@ const musicController = {
       }
       // // add music to singer
       if (req.body.singers) {
+        // add music to Singer
         const singer = Singer.findById(req.body.singers);
         await singer.updateOne({
           // $push: thêm trường _id vào array Singer
@@ -64,9 +63,6 @@ const musicController = {
           },
         });
       }
-
-      // if (req.body.tag) {
-      // }
 
       res.json({
         message: "add new music successfully.",
@@ -89,9 +85,13 @@ const musicController = {
 
       const total = Math.ceil(musics.length / PAGE_SIZE);
 
-      res
-        .status(200)
-        .json({ data: musics, current_page: page, last_page: total });
+      res.status(200).json({
+        data: musics,
+        current_page: page,
+        last_page: total,
+        per_page: PAGE_SIZE,
+        count_items: musics.length,
+      });
     } catch (error) {
       res.status(500).json(error);
     }
