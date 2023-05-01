@@ -24,6 +24,19 @@ const albumSchema = new mongoose.Schema({
     },
   ],
 
+  // singers_name: {
+  //   type: String,
+  //   required: false,
+  //   default: "",
+  // },
+
+  tags:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tag",
+    }
+  ],
+
   ranker: {
     type: Number || null,
     required: false,

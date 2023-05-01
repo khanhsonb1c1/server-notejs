@@ -6,6 +6,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+var _ = require('lodash');
+
 
 //* decrare blog route
 const blogRoute = require("./routes/blog/BlogRouter");
@@ -16,6 +18,10 @@ const musicRoute = require("./routes/music/MusicRouter");
 const albumRoute = require("./routes/music/AlbumRouter");
 const singerRoute = require("./routes/music/SingerRouter");
 const tagRoute = require("./routes/music/TagRouter");
+
+// * decrare user route
+const userRoute = require("./routes/user/UserRouter");
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
@@ -42,6 +48,11 @@ app.use("/api/musics", musicRoute);
 app.use("/api/albums", albumRoute);
 app.use("/api/singers", singerRoute);
 app.use("/api/tags", tagRoute);
+
+//* USER
+app.use("/api/users", userRoute);
+
+
 
 app.get("/", (req, res) => {
   res.send("Wellcome to server of Khanh Son !");

@@ -77,20 +77,36 @@ const musicController = {
     try {
       const PAGE_SIZE = 12;
 
+      const filter = req.query.filter;
+
       const page = parseInt(req.query.page) || 1;
 
       const skip = (page - 1) * PAGE_SIZE;
 
-      const musics = await Music.find().skip(skip).limit(PAGE_SIZE);
+      //* GET LIST
 
-      const total = Math.ceil(musics.length / PAGE_SIZE);
+      const musics = await Music.find()
+        .skip(skip)
+        .limit(PAGE_SIZE)
+        .populate({
+          path: "singers",
+          select: "id -_id name"
+        });
+
+      const musics_total = await Music.count()
+
+      const total = Math.ceil(musics_total / PAGE_SIZE);
+
+      //* GET name list:
 
       res.status(200).json({
         data: musics,
         current_page: page,
         last_page: total,
+        items_count: musics_total,
         per_page: PAGE_SIZE,
         count_items: musics.length,
+        filter: filter,
       });
     } catch (error) {
       res.status(500).json(error);
@@ -111,6 +127,7 @@ const musicController = {
       const music = await Music.findById(req.params.id);
       // $set: thay thế object
       await music.updateOne({ $set: req.body });
+
       res.status(200).json("Updated successfully !");
     } catch (error) {
       res.status(500).json(error);

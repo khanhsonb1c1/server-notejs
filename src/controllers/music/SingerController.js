@@ -37,7 +37,10 @@ const singerController = {
 
       const skip = (page - 1) * PAGE_SIZE;
 
-      const singers = await Singer.find().skip(skip).limit(PAGE_SIZE);
+      const singers = await Singer.find().skip(skip).limit(PAGE_SIZE).populate({
+        path:'musics',
+        select: 'name -_id id updated_at ranker',
+      })
 
       const total = Math.ceil(singers.length / PAGE_SIZE);
 
@@ -51,7 +54,13 @@ const singerController = {
 
   detail: async (req, res) => {
     try {
-      const singer = await Singer.findOne({ id: req.params.id });
+      const singer = await Singer.findOne({ id: req.params.id }).populate({
+        path:'musics',
+        select: 'name id -_id updated_at ranker image_url play_url'
+      }).populate({
+        path: 'albums',
+        select: 'id -_id name ranker'
+      });
       res.status(200).json(singer);
     } catch (error) {
       res.status(500).json(error);

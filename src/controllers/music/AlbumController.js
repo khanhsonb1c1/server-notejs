@@ -1,7 +1,6 @@
 const { Album } = require("../../models/music/AlbumModel");
 const fs = require("fs-extra");
 const { Singer } = require("../../models/music/SingerModel");
-
 const cloudinary = require("../../services/cloudinary");
 const { Music } = require("../../models/music/MusicModel");
 
@@ -17,6 +16,7 @@ const albumController = {
         name: req.body.name,
         singer: req.body.singer,
         image_url: image_save.url,
+        tags: req.body.tags,
         // musics: req.body.musics,
       });
 
@@ -51,13 +51,44 @@ const albumController = {
 
       const skip = (page - 1) * PAGE_SIZE;
 
-      const albums = await Album.find().skip(skip).limit(PAGE_SIZE);
+      const albums = await Album.find()
+        .populate({
+          path: "musics",
+          select: "-_id image_url play_url name id",
+          populate: {
+            path: "singers",
+            select: "name id -_id",
+          },
+
+        })
+        .skip(skip)
+        .limit(PAGE_SIZE);
 
       const total = Math.ceil(albums.length / PAGE_SIZE);
 
+      //* GET name singers in all musics
+      const result = JSON.parse(JSON.stringify(albums));
+
+      result.map((al => {
+        const names = [];
+
+        al.musics.forEach((item) => {
+        item.singers.forEach((item2) => {
+          const check = names.find((m) => m == item2.name);
+          if (!check) {
+            names.push(item2.name);
+          }
+        });
+      });
+
+      al.singers_name = names.toString().replace((/,/gi, ", "));
+
+      return al
+      }))
+
       res
         .status(200)
-        .json({ data: albums, current_page: page, last_page: total });
+        .json({ data: result, current_page: page, last_page: total });
     } catch (error) {
       res.status(500).json(error);
     }
@@ -65,8 +96,31 @@ const albumController = {
 
   detail: async (req, res) => {
     try {
-      const album = await Album.findOne({ id: req.params.id });
-      res.status(200).json(album);
+      const album = await Album.findOne({ id: req.params.id }).populate({
+        path: "musics",
+        select: "name id -_id",
+        populate: {
+          path: "singers",
+          select: "image_url name id -_id",
+        },
+      });
+
+      const result = JSON.parse(JSON.stringify(album));
+
+      const names = [];
+
+      result.musics.forEach((item) => {
+        item.singers.forEach((item2) => {
+          const check = names.find((m) => m == item2.name);
+          if (!check) {
+            names.push(item2.name);
+          }
+        });
+      });
+
+      result.singers_name = names.toString().replace((/,/gi, ", "));
+
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json(error);
     }
@@ -74,10 +128,20 @@ const albumController = {
 
   update: async (req, res) => {
     try {
-      const music = await Album.findById(req.params.id);
+      const album = await Album.findById(req.params.id);
       // $set: thay thế object
-      await music.updateOne({ $set: req.body });
-      res.status(200).json("Updated successfully !");
+      await album.updateOne({
+        $set: {
+          name: req.body.name,
+          ranker: req.body.ranker,
+          tags: req.body.tags,
+        },
+      });
+      const new_album = await Album.findById(req.params.id);
+      res.status(200).json({
+        message: "Update successfully !",
+        data: new_album,
+      });
     } catch (error) {
       res.status(500).json(error);
     }
