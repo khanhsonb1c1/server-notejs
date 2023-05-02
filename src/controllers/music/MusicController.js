@@ -77,23 +77,116 @@ const musicController = {
     try {
       const PAGE_SIZE = 12;
 
-      const filter = req.query.filter;
+      const filter = req.body.filter;
+
+      const sort = req.body.sort
 
       const page = parseInt(req.query.page) || 1;
 
       const skip = (page - 1) * PAGE_SIZE;
 
-      //* GET LIST
+      //*========= FILTER ========
 
-      const musics = await Music.find()
+      // filter: {
+      //   name,
+      //   tags,
+      //   singers,
+      //   album,
+      // }
+
+      // sort: {
+      //    updated_at
+      //    views
+      // }
+
+      //? case 1: filter name
+      let filter_name = undefined;
+      if (req.body.filter?.name) {
+        filter_name = {
+          name: { $regex: filter.name, $options: "i" },
+        };
+      }
+
+      //? case 2: filter tags
+      let filter_tags = undefined;
+      if(req.body.filter?.tags_id){
+        filter_tags = {
+         "tags": {
+            $all : filter.tags_id
+          }
+        }
+      }
+      
+      // //? case 3: filter album
+      let filter_album = undefined;
+      if (req.body.filter?.album) {
+        filter_album = {
+          album: filter.album,
+        };
+      }
+
+      // //? case 4: filter singers
+      let filter_singers = undefined;
+      if(req.body.filter?.singers_id){
+        filter_singers = {
+         "singers": {
+            $all : filter.singers_id
+          }
+        }
+      }
+
+
+
+
+      let final_filter = undefined;
+
+      if(filter){
+        final_filter = {...filter_album, ...filter_name, ...filter_tags, ...filter_singers}
+
+      }
+
+     
+    
+      //*========= END FILTER ========
+
+       //* ====== SORT ==============
+      // //? case 1: sort updated_at
+      let sort_updated = undefined;
+      if(req.body.sort?.updated_at){
+        sort_updated = {
+         updated_at: sort.updated_at
+        }
+      }
+      // //? case 1: sort updated_at
+      let sort_views = undefined;
+      if(req.body.sort?.views){
+        sort_views = {
+          views: sort.views
+        }
+      }
+
+      
+       let final_sort = undefined;
+
+       if(sort){
+         final_sort = {...sort_updated, ...sort_views}
+ 
+       }
+
+      //* GET LIST
+      const musics = await Music.find(final_filter)
         .skip(skip)
         .limit(PAGE_SIZE)
         .populate({
           path: "singers",
-          select: "id -_id name"
-        });
+          select: "id -_id name",
+        })
+        .populate({
+          path: "tags",
+          select: "id name",
+        }).sort(sort);
 
-      const musics_total = await Music.count()
+      const musics_total = await Music.count();
 
       const total = Math.ceil(musics_total / PAGE_SIZE);
 
@@ -106,7 +199,7 @@ const musicController = {
         items_count: musics_total,
         per_page: PAGE_SIZE,
         count_items: musics.length,
-        filter: filter,
+        // filter: final_filter,
       });
     } catch (error) {
       res.status(500).json(error);
@@ -115,7 +208,7 @@ const musicController = {
 
   detail: async (req, res) => {
     try {
-      const music = await Music.findOne({ id: req.params.id });
+      const music = await Music.find({ id: req.params.id });
       res.status(200).json(music);
     } catch (error) {
       res.status(500).json(error);
@@ -124,11 +217,23 @@ const musicController = {
 
   update: async (req, res) => {
     try {
-      const music = await Music.findById(req.params.id);
+      // const music = await Music.find({id: req.params.id});
       // $set: thay thế object
-      await music.updateOne({ $set: req.body });
+      await Music.findOneAndUpdate(
+        { id: req.params.id },
+        {
+          $set: {
+            views: req.body.views,
+            name: req.body.name,
+            ranker: req.body.ranker,
+            tags: req.body.tags,
+          },
+        }
+      );
 
-      res.status(200).json("Updated successfully !");
+      res
+        .status(200)
+        .json({ mess: "Updated successfully !", updated: req.body });
     } catch (error) {
       res.status(500).json(error);
     }
@@ -151,7 +256,7 @@ const musicController = {
       );
 
       // delete music
-      await Music.findByIdAndDelete(req.params.id);
+      await Music.findOneAndRemove({ id: req.params.id });
 
       res.status(200).json("Deleted successfully !");
     } catch (error) {

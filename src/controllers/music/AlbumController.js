@@ -43,14 +43,32 @@ const albumController = {
     }
   },
 
+  //! demo all function
   fetch: async (req, res) => {
     try {
+      //* ====  HANDLE PAGINATE  ============
       const PAGE_SIZE = 12;
 
       const page = parseInt(req.query.page) || 1;
 
       const skip = (page - 1) * PAGE_SIZE;
+      //*========== END PAGINATE =============
 
+
+      //* HANDLE FILTER ======================
+
+      const FILTER = req.body.filter
+
+      
+
+
+
+
+      //* END HANDLE FILTER ==================
+
+
+
+      //* GET IN DATABASE
       const albums = await Album.find()
         .populate({
           path: "musics",
@@ -64,14 +82,14 @@ const albumController = {
         .skip(skip)
         .limit(PAGE_SIZE);
 
-      const total = Math.ceil(albums.length / PAGE_SIZE);
+      //* ========= END GET IN DATABASE ========  
 
-      //* GET name singers in all musics
+
+      //* ===== GET name singers in all musics =====
       const result = JSON.parse(JSON.stringify(albums));
 
       result.map((al => {
         const names = [];
-
         al.musics.forEach((item) => {
         item.singers.forEach((item2) => {
           const check = names.find((m) => m == item2.name);
@@ -80,12 +98,16 @@ const albumController = {
           }
         });
       });
-
       al.singers_name = names.toString().replace((/,/gi, ", "));
-
       return al
       }))
+      //* =====END GET name singers in all musics ====
 
+      //* ======== TOTAL PAGE =============
+      const total = Math.ceil(albums.length / PAGE_SIZE);
+      //* ======== END TOTAL PAGE =========
+
+      //* RESPONSE 
       res
         .status(200)
         .json({ data: result, current_page: page, last_page: total });

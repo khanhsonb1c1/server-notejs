@@ -36,6 +36,11 @@ const musicSchema = new mongoose.Schema({
     required: false,
     default: null,
   },
+  views: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
 
   image_url: {
     type: String,
