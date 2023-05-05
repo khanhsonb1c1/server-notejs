@@ -169,7 +169,7 @@ const musicController = {
           path: "tags",
           select: "id name",
         })
-        .sort(sort);
+        .sort(final_sort);
 
       const musics_total = await Music.count();
 
