@@ -7,6 +7,22 @@ const singerSchema = new mongoose.Schema({
     unique: true,
   },
 
+  // _id: {
+  //   type: String,
+  //   required: true,
+  //   unique: true,
+  //   default: function () {
+  //     // Generate a custom ID with a specific length
+  //     const idLength = 10;
+  //     let id = '';
+  //     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  //     for (let i = 0; i < idLength; i++) {
+  //       id += characters.charAt(Math.floor(Math.random() * characters.length));
+  //     }
+  //     return id;
+  //   },
+  // },
+
   name: {
     type: String,
     required: true,

@@ -24,4 +24,7 @@ router.put("/:id", musicController.update);
 
 router.post("/delete/:id", musicController.delete);
 
+router.post("/create_any", musicController.create_any);
+
 module.exports = router;
+

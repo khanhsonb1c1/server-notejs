@@ -6,7 +6,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-var _ = require('lodash');
+// var _ = require('lodash');
 
 
 //* decrare blog route
@@ -22,6 +22,9 @@ const tagRoute = require("./routes/music/TagRouter");
 // * decrare user route
 const userRoute = require("./routes/user/UserRouter");
 
+
+//* decrare revert route
+const revertMusicRoute = require("./routes/deleted/revertMusic")
 
 app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
@@ -52,6 +55,9 @@ app.use("/api/tags", tagRoute);
 //* USER
 app.use("/api/users", userRoute);
 
+
+//* REVERT
+app.use("/api/revert", revertMusicRoute);
 
 
 app.get("/", (req, res) => {

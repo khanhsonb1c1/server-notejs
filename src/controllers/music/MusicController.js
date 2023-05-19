@@ -4,6 +4,7 @@ const { Album } = require("../../models/music/AlbumModel");
 const { Singer } = require("../../models/music/SingerModel");
 const cloudinary = require("../../services/cloudinary");
 const fs = require("fs-extra");
+// const { default: mongoose } = require("mongoose");
 
 const musicController = {
   create: async (req, res) => {
@@ -42,7 +43,7 @@ const musicController = {
 
       const saveMusic = await newMusic.save();
 
-      // // add music to album
+      // add music to album
       if (req.body.album) {
         // add music vao album
         const album = Album.findById(req.body.album);
@@ -159,7 +160,7 @@ const musicController = {
       }
 
       //* GET LIST
-      const musics = await Music.find({...final_filter, isDeleted: "false"})
+      const musics = await Music.find({ ...final_filter, isDeleted: "false" })
         .skip(skip)
         .limit(PAGE_SIZE)
         .populate({
@@ -194,13 +195,12 @@ const musicController = {
 
   detail: async (req, res) => {
     try {
-     
-      const music = await Music.find({ id: req.params.id, isDeleted: "false"});
+      const music = await Music.findOne({ id: req.params.id, isDeleted: "false" });
 
-      if(music.length){
-        res.status(200).json(music[0]);
+      if (music) {
+        res.status(200).json(music);
       } else {
-        res.status(500).json({messgae: "Do not find this music"})
+        res.status(500).json({ message: "Can not find this music" });
       }
     } catch (error) {
       res.status(500).json(error);
@@ -243,26 +243,8 @@ const musicController = {
   //   }
   // },
 
-
-
-
   delete: async (req, res) => {
-    
     try {
-      // delete music in album
-      await Album.updateMany(
-        // $pull: móc cái cần tìm ra từ arr ( xóa đi)
-        { musics: req.params.id },
-        { $pull: { musics: req.params.id } } // móc mấy cái music có id = param id ( xóa đi)
-      );
-
-      //delete music in singer
-      await Singer.updateMany(
-        // $pull: móc cái cần tìm ra từ arr ( xóa đi)
-        { singers: req.params.id },
-        { $pull: { singers: req.params.id } } // móc mấy cái music có id = param id ( xóa đi)
-      );
-
       // delete music
       // await Music.findOneAndRemove({ id: req.params.id });
 
@@ -277,30 +259,72 @@ const musicController = {
 
       const record_id = req.params.id;
 
-      const record = await Music.find({id: record_id})
+      const record = await Music.findOne({ id: record_id });
 
       const newRecord = new DeleteMusic({
+        _id: record._id,
         id: record_id,
-        name: record[0].name,
-        tags: record[0].tags,
-        album: record[0].album,
-        singers: record[0].singers,
-        ranker: record[0].ranker,
-        views: record[0].views,
-        likes: record[0].likes,
-        image_url: record[0].image_url,
-        play_url: record[0].play_url,
+        name: record.name,
+        tags: record.tags,
+        album: record.album,
+        singers: record.singers,
+        ranker: record.ranker,
+        views: record.views,
+        likes: record.likes,
+        image_url: record.image_url,
+        play_url: record.play_url,
         isDeleted: true,
-      })
+      });
 
 
       await newRecord.save();
 
-      await Music.findOneAndRemove({ id: req.params.id });
+      await Music.findOneAndRemove({ id: record_id });
 
-      res.status(200).json({message: "Deleted successfully !", data: newRecord});
+      // delete music in album
+      await Album.updateMany(
+        // $pull: móc cái cần tìm ra từ arr ( xóa đi)
+        { musics: record._id },
+        { $pull: { musics: record._id } } // móc cái music có id = param id ( xóa đi)
+      );
+
+      // //delete music in singer
+      await Singer.updateMany(
+        // $pull: móc cái cần tìm ra từ arr ( xóa đi)
+        { musics: record._id},
+        { $pull: { musics: record._id} } // móc mấy cái music có id = param id ( xóa đi)
+      );
+
+      res
+        .status(200)
+        .json({ message: "Deleted successfully !"});
     } catch (error) {
       res.status(500).json(error);
+    }
+  },
+
+  create_any: async (req, res) => {
+    try {
+      res.status(200).json("comming soon !");
+      // let i = 3000;
+      // for(let id = 1; id < 5; id++){
+      //  await Music.create({
+      //     id: i +1,
+      //     name: `Dữ liệu test music 2 ${id+1}`,
+      //     image_url: "https://res.cloudinary.com/dionk3ia2/image/upload/v1681224996/blogger/album/qozzw6uu9nuzc3dvailb.jpg",
+      //     likes: 1000,
+      //     views: 1000,
+      //     play_url: "https://res.cloudinary.com/dionk3ia2/video/upload/v1681231150/blogger/music/pksgj5zfbg3ddmxcqtjg.mp3",
+      //     ranker: i + 1,
+      //     updated_at: Math.round(+new Date() / 1000),
+      //     singers: ["645789521dadde4f2e8f95f1"],
+      //     album: "64658be7e36469f68fcc09a9",
+      //     tags: "64412653f44a7f59e0550a5d",
+      //     isDeleted: false,
+      //   })
+      // }
+    } catch (error) {
+      //
     }
   },
 };
