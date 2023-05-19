@@ -20,6 +20,8 @@ router.get("/:id", musicController.detail);
 
 router.put("/:id", musicController.update);
 
-router.delete("/:id", musicController.delete);
+// router.post("/update", musicController.updateAll);
+
+router.post("/delete/:id", musicController.delete);
 
 module.exports = router;

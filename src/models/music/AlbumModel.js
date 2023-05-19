@@ -24,12 +24,6 @@ const albumSchema = new mongoose.Schema({
     },
   ],
 
-  // singers_name: {
-  //   type: String,
-  //   required: false,
-  //   default: "",
-  // },
-
   tags:[
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -38,9 +32,21 @@ const albumSchema = new mongoose.Schema({
   ],
 
   ranker: {
-    type: Number || null,
-    required: false,
-    default: null,
+    type: Number,
+    required: true,
+    default: 0,
+  },
+
+  views: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  
+  likes: {
+    type: Number,
+    required: true,
+    default: 0,
   },
 
   musics: [
@@ -51,6 +57,12 @@ const albumSchema = new mongoose.Schema({
     },
   ],
 
+  isDeleted: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+
   updated_at: {
     type: Number,
     default: Math.round(+new Date() / 1000),
@@ -59,5 +71,6 @@ const albumSchema = new mongoose.Schema({
 });
 
 const Album = mongoose.model("Album", albumSchema);
+
 
 module.exports = { Album };

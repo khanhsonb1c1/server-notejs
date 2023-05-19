@@ -1,5 +1,5 @@
 const albumController = require("../../controllers/music/AlbumController");
-const checkUploadMiddleware = require("../../middlewares/checkUpload");
+// const checkUploadMiddleware = require("../../middlewares/checkUpload");
 const upload = require("../../middlewares/upload");
 
 const router = require("express").Router();
@@ -15,5 +15,8 @@ router.put("/:id", albumController.update);
 router.delete("/:id", albumController.delete);
 
 router.post("/get-top-albums", albumController.get_album_top);
+
+router.post("/create_any", albumController.create_any);
+
 
 module.exports = router;

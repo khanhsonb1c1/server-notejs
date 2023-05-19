@@ -17,6 +17,12 @@ const singerSchema = new mongoose.Schema({
     required: true,
   },
 
+  local: {
+    type: String,
+    required: true,
+    default: 'vn' // us-uk, 'cn'
+  },
+
   musics: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -32,9 +38,21 @@ const singerSchema = new mongoose.Schema({
   ],
 
   ranker: {
-    type: Number || null,
-    required: false,
-    default: null,
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  
+  likes: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+
+  isDeleted: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
 
 

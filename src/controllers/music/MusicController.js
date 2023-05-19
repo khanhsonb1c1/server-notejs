@@ -1,4 +1,5 @@
 const { Music } = require("../../models/music/MusicModel");
+const { DeleteMusic } = require("../../models/deleted/deletedMusicModel");
 const { Album } = require("../../models/music/AlbumModel");
 const { Singer } = require("../../models/music/SingerModel");
 const cloudinary = require("../../services/cloudinary");
@@ -158,7 +159,7 @@ const musicController = {
       }
 
       //* GET LIST
-      const musics = await Music.find(final_filter)
+      const musics = await Music.find({...final_filter, isDeleted: "false"})
         .skip(skip)
         .limit(PAGE_SIZE)
         .populate({
@@ -193,8 +194,14 @@ const musicController = {
 
   detail: async (req, res) => {
     try {
-      const music = await Music.find({ id: req.params.id });
-      res.status(200).json(music);
+     
+      const music = await Music.find({ id: req.params.id, isDeleted: "false"});
+
+      if(music.length){
+        res.status(200).json(music[0]);
+      } else {
+        res.status(500).json({messgae: "Do not find this music"})
+      }
     } catch (error) {
       res.status(500).json(error);
     }
@@ -224,7 +231,23 @@ const musicController = {
     }
   },
 
+  // updateAll: async (req, res) => {
+  //   try {
+  //     await Music.updateMany({}, { $set: { isDeleted: false} })
+
+  //     res
+  //       .status(200)
+  //       .json({ mess: "Updated all successfully !"});
+  //   } catch (error) {
+  //     res.status(500).json(error);
+  //   }
+  // },
+
+
+
+
   delete: async (req, res) => {
+    
     try {
       // delete music in album
       await Album.updateMany(
@@ -241,9 +264,41 @@ const musicController = {
       );
 
       // delete music
+      // await Music.findOneAndRemove({ id: req.params.id });
+
+      //* Solution 1: set isDeleted = true, when fetch, check isDeleted = fase.
+      // await Music.findOneAndUpdate({ id: req.params.id }, {
+      //   $set: {
+      //     isDeleted: true
+      //   }
+      // })
+
+      //* Solution 2: Move to new Collection, and remove record
+
+      const record_id = req.params.id;
+
+      const record = await Music.find({id: record_id})
+
+      const newRecord = new DeleteMusic({
+        id: record_id,
+        name: record[0].name,
+        tags: record[0].tags,
+        album: record[0].album,
+        singers: record[0].singers,
+        ranker: record[0].ranker,
+        views: record[0].views,
+        likes: record[0].likes,
+        image_url: record[0].image_url,
+        play_url: record[0].play_url,
+        isDeleted: true,
+      })
+
+
+      await newRecord.save();
+
       await Music.findOneAndRemove({ id: req.params.id });
 
-      res.status(200).json("Deleted successfully !");
+      res.status(200).json({message: "Deleted successfully !", data: newRecord});
     } catch (error) {
       res.status(500).json(error);
     }

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const musicSchema = new mongoose.Schema({
+const deleteMusicSchema = new mongoose.Schema({
   id: {
     type: String,
     require: true,
@@ -63,7 +63,6 @@ const musicSchema = new mongoose.Schema({
     default: false,
   },
 
-
   updated_at: {
     type: Number,
     default: Math.round(+new Date() / 1000),
@@ -71,6 +70,6 @@ const musicSchema = new mongoose.Schema({
   },
 });
 
-const Music = mongoose.model("Music", musicSchema);
+const DeleteMusic = mongoose.model("DeleteMusic", deleteMusicSchema);
 
-module.exports = { Music };
+module.exports = { DeleteMusic };

@@ -13,6 +13,8 @@ const singerController = {
         id: req.body.id,
         name: req.body.name,
         image_url: singer_save.url,
+        local: req.body.local,
+        description: req.description,
       });
 
       // console.log(req.file)
@@ -37,10 +39,14 @@ const singerController = {
 
       const skip = (page - 1) * PAGE_SIZE;
 
-      const singers = await Singer.find().skip(skip).limit(PAGE_SIZE).populate({
-        path:'musics',
-        select: 'name -_id id updated_at ranker',
-      })
+      const singers = await Singer.find()
+        .skip(skip)
+        .limit(PAGE_SIZE)
+        .populate({
+          path: "musics",
+          select: "name -_id id updated_at ranker play_url",
+        })
+        .select("-albums");
 
       const total = Math.ceil(singers.length / PAGE_SIZE);
 
@@ -52,15 +58,29 @@ const singerController = {
     }
   },
 
+  get_top_singer_vn: async (req, res) => {
+    try {
+      const singers = await Singer.find({local: "vn"})
+        .limit(5)
+      res
+        .status(200)
+        .json(singers);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+
   detail: async (req, res) => {
     try {
-      const singer = await Singer.findOne({ id: req.params.id }).populate({
-        path:'musics',
-        select: 'name id -_id updated_at ranker image_url play_url'
-      }).populate({
-        path: 'albums',
-        select: 'id -_id name ranker'
-      });
+      const singer = await Singer.findOne({ id: req.params.id })
+        .populate({
+          path: "musics",
+          select: "name id -_id updated_at ranker image_url play_url",
+        })
+        .populate({
+          path: "albums",
+          select: "id -_id name ranker",
+        });
       res.status(200).json(singer);
     } catch (error) {
       res.status(500).json(error);
@@ -69,9 +89,21 @@ const singerController = {
 
   update: async (req, res) => {
     try {
-      const singer = await Singer.findById(req.params.id);
-      await singer.updateOne({ $set: req.body });
-      res.status(200).json("Updated successfully !");
+      await Singer.findOneAndUpdate(
+        { id: req.params.id },
+        {
+          $set: {
+            ranker: req.body.ranker,
+            name: req.body.name,
+            local: req.body.local,
+            description: req.description,
+          },
+        }
+      );
+
+      res
+        .status(200)
+        .json({ message: "Updated successfully !", updated: req.body });
     } catch (error) {
       res.status(500).json(error);
     }

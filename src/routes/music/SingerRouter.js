@@ -7,10 +7,12 @@ router.post("/", upload.single("image_url"), singerController.create);
 
 router.get("/", singerController.fetch);
 
+router.get("/top-singers-vn", singerController.get_top_singer_vn);
+
 router.get("/:id", singerController.detail);
 
 router.put("/:id", singerController.update);
 
-// router.get("/:id", singerController.detail);
+// router.delete("/:id", singerController.delete);
 
 module.exports = router;

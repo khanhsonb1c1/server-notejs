@@ -5,6 +5,22 @@ const cloudinary = require("../../services/cloudinary");
 const { Music } = require("../../models/music/MusicModel");
 
 const albumController = {
+  create_any: async () => {
+    try {
+      for(let id = 2000; id < 2015; id++){
+        Album.create({
+          id: id +1,
+          name: `Dữ liệu test ${id+1}`,
+          image_url: "https://res.cloudinary.com/dionk3ia2/image/upload/v1681224996/blogger/album/qozzw6uu9nuzc3dvailb.jpg",
+          ranker: 100,
+          updated_at: 1681224891,
+          tag: ["64412671f44a7f59e0550a61"]
+        })
+      }
+    } catch (error) {
+      //
+    }
+  },
   get_album_top: async (req, res) => {
     try {
       const top100 = await Album.find({
@@ -54,6 +70,7 @@ const albumController = {
       res.send(error);
     }
   },
+
   create: async (req, res) => {
     try {
       const image_save = await cloudinary.uploader.upload(req.file.path, {
@@ -223,12 +240,12 @@ const albumController = {
     try {
       const album = await Album.findOne({ id: req.params.id }).populate({
         path: "musics",
-        select: "name id -_id",
+        select: "name id -_id image_url updated_at play_url likes views",
         populate: {
           path: "singers",
           select: "image_url name id -_id",
         },
-      });
+      }, );
 
       const result = JSON.parse(JSON.stringify(album));
 
@@ -260,7 +277,9 @@ const albumController = {
             name: req.body.name,
             ranker: req.body.ranker,
             tags: req.body.tags,
-          },
+            views: req.body.views,
+            likes: req.body.likes
+          }
         }
       );
       // const new_album = await Album.findById(req.params.id);
