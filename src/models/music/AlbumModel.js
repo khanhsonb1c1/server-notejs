@@ -17,12 +17,12 @@ const albumSchema = new mongoose.Schema({
     required: true,
   },
 
-  singers: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Singer",
-    },
-  ],
+  // singers: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: "Singer",
+  //   },
+  // ],
 
   tags:[
     {
