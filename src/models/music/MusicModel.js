@@ -63,7 +63,6 @@ const musicSchema = new mongoose.Schema({
     default: false,
   },
 
-
   updated_at: {
     type: Number,
     default: Math.round(+new Date() / 1000),

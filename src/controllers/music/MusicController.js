@@ -34,7 +34,7 @@ const musicController = {
       const newMusic = new Music({
         id: req.body.id,
         name: req.body.name,
-        tag: req.body.tag,
+        tags: req.body.tags,
         album: req.body.album,
         image_url: song_save.url,
         singers: req.body.singers,

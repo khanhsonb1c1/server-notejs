@@ -7,15 +7,16 @@ const { Music } = require("../../models/music/MusicModel");
 const albumController = {
   create_any: async () => {
     try {
-      for(let id = 2000; id < 2015; id++){
+      for (let id = 2000; id < 2015; id++) {
         Album.create({
-          id: id +1,
-          name: `Dữ liệu test ${id+1}`,
-          image_url: "https://res.cloudinary.com/dionk3ia2/image/upload/v1681224996/blogger/album/qozzw6uu9nuzc3dvailb.jpg",
+          id: id + 1,
+          name: `Dữ liệu test ${id + 1}`,
+          image_url:
+            "https://res.cloudinary.com/dionk3ia2/image/upload/v1681224996/blogger/album/qozzw6uu9nuzc3dvailb.jpg",
           ranker: 100,
           updated_at: 1681224891,
-          tag: ["64412671f44a7f59e0550a61"]
-        })
+          tag: ["64412671f44a7f59e0550a61"],
+        });
       }
     } catch (error) {
       //
@@ -80,29 +81,17 @@ const albumController = {
       const newAlbum = new Album({
         id: req.body.id,
         name: req.body.name,
-        singer: req.body.singer,
         image_url: image_save.url,
         tags: req.body.tags,
         musics: req.body.musics,
       });
 
-      const saveAlbum = await newAlbum.save();
+      await newAlbum.save();
 
       await fs.remove(req.file.path);
 
-      // add album to singer
-      if (req.body.singer) {
-        const singer = await Singer.findById(req.body.singer);
-        await singer.updateOne({
-          $push: {
-            albums: saveAlbum._id,
-          },
-        });
-      }
-
       res.status(200).json({
         message: "add new album successfully.",
-        album: saveAlbum,
       });
     } catch (error) {
       res.send(error);
@@ -245,7 +234,7 @@ const albumController = {
           path: "singers",
           select: "image_url name id -_id",
         },
-      }, );
+      });
 
       const result = JSON.parse(JSON.stringify(album));
 
@@ -278,8 +267,8 @@ const albumController = {
             ranker: req.body.ranker,
             tags: req.body.tags,
             views: req.body.views,
-            likes: req.body.likes
-          }
+            likes: req.body.likes,
+          },
         }
       );
       // const new_album = await Album.findById(req.params.id);
