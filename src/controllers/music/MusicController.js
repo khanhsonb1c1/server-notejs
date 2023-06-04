@@ -195,7 +195,7 @@ const musicController = {
 
   detail: async (req, res) => {
     try {
-      const music = await Music.findOne({ id: req.params.id, isDeleted: "false" });
+      const music = await Music.findOne({ id: req.params.id, isDeleted: "false" }).populate("album");
 
       if (music) {
         res.status(200).json(music);

@@ -234,6 +234,8 @@ const albumController = {
           path: "singers",
           select: "image_url name id -_id",
         },
+      }).populate({
+        path: "tags"
       });
 
       const result = JSON.parse(JSON.stringify(album));
