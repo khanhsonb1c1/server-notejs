@@ -7,6 +7,34 @@ const fs = require("fs-extra");
 // const { default: mongoose } = require("mongoose");
 
 const musicController = {
+
+  // search all
+
+  searchAll: async (req, res) => {
+    try {
+
+      const search = req.query.search;
+
+      const musics = await Music.find({  name: { $regex: search, $options: "i" }, });
+
+      const albums = await Album.find({ name: { $regex: search, $options: "i" }, });
+
+      const singers = await Singer.find({ name: { $regex: search, $options: "i" },})
+
+
+      res.json({
+      
+        musics: musics,
+        albums: albums,
+        singers: singers
+      })
+      
+    } catch (error) {
+      req.json(error)
+    }
+  },
+ 
+
   create: async (req, res) => {
     try {
       const song_save = await cloudinary.uploader.upload(
@@ -195,7 +223,7 @@ const musicController = {
 
   detail: async (req, res) => {
     try {
-      const music = await Music.findOne({ id: req.params.id, isDeleted: "false" });
+      const music = await Music.findOne({ id: req.params.id, isDeleted: "false" }).populate("album");
 
       if (music) {
         res.status(200).json(music);

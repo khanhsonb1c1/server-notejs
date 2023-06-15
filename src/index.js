@@ -23,6 +23,9 @@ const tagRoute = require("./routes/music/TagRouter");
 const userRoute = require("./routes/user/UserRouter");
 
 
+const searchRoute = require("./routes/searchRouter");
+
+
 //* decrare revert route
 const revertMusicRoute = require("./routes/deleted/revertMusic")
 
@@ -58,6 +61,10 @@ app.use("/api/users", userRoute);
 
 //* REVERT
 app.use("/api/revert", revertMusicRoute);
+
+//* search
+
+app.use("/api/search_all", searchRoute);
 
 
 app.get("/", (req, res) => {
