@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
 
+  email: {
+    type: String,
+    required: true,
+  },
+  
   full_name: {
     type: String,
     required: true,
@@ -37,12 +42,6 @@ const userSchema = new mongoose.Schema({
       ref: "Singer",
     },
   ],
-
-  user_name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
 
   password: {
     type: String,

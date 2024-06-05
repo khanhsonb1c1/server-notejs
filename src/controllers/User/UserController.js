@@ -6,7 +6,7 @@ const userController = {
       const newUser = new User({
         id: req.body.id,
         full_name: req.body.full_name,
-        user_name: req.body.user_name,
+        email: req.body.email,
         password: req.body.password,
         role: req.body.role,
       });
@@ -15,7 +15,7 @@ const userController = {
 
       res.status(200).json({
         message: "add new user successfully.",
-        singer: saveUser,
+        data: saveUser,
       });
     } catch (error) {
       res.send(error);
@@ -33,7 +33,7 @@ const userController = {
 
   detail: async (req, res) => {
     try {
-      const user = await User.findOne({ id: req.params.id });
+      const user = await User.findById( req.params.id).populate("favoriteMusics");
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json(error);

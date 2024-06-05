@@ -18,6 +18,8 @@ const musicRoute = require("./routes/music/MusicRouter");
 const albumRoute = require("./routes/music/AlbumRouter");
 const singerRoute = require("./routes/music/SingerRouter");
 const tagRoute = require("./routes/music/TagRouter");
+const authRoute = require("./routes/auth/authRoute");
+const favoriteRoute = require("./routes/favorite/favoriteRoute");
 
 // * decrare user route
 const userRoute = require("./routes/user/UserRouter");
@@ -57,6 +59,12 @@ app.use("/api/tags", tagRoute);
 
 //* USER
 app.use("/api/users", userRoute);
+
+//* AUTH
+app.use("/api/auth", authRoute);
+
+//* favorite
+app.use("/api/favorite", favoriteRoute);
 
 
 //* REVERT
