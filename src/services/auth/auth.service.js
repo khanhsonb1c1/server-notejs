@@ -22,8 +22,6 @@ const authService = {
     try {
       const user_data = await UserDAO.getUserByEmail(email);
 
-      console.log(user_data, "user data");
-
       if (user_data.password == oldPassword) {
         await UserDAO.updateUser(user_data._id, {
           password: newPassword,

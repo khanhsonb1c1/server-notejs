@@ -18,7 +18,7 @@ const userController = {
         data: saveUser,
       });
     } catch (error) {
-      res.send(error);
+      res.status(500).json(error);
     }
   },
 

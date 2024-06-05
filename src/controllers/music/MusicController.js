@@ -112,7 +112,7 @@ const musicController = {
       const skip = (page - 1) * PAGE_SIZE;
 
       //*========= FILTER ========
-      const filter = req.params.filter;
+      const filter = req.query.filter;
 
       //? case 1: filter name
       let filter_name = undefined;
@@ -164,7 +164,7 @@ const musicController = {
       //*========= END FILTER ========
 
       //* ====== SORT ==============
-      const sort = req.params.sort;
+      const sort = req.query.sort;
 
       // //? case 1: sort updated_at
       let sort_updated = undefined;

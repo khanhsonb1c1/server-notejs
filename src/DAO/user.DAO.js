@@ -21,8 +21,7 @@ const UserDAO = {
       // Tìm người dùng theo ID trong cơ sở dữ liệu
       const user = await User.findOne({
         email: email
-      });
-      console.log(user, "user---");
+      }).populate("favoriteMusics");
       if (!user) {
         throw new Error("Can not find email");
       }
